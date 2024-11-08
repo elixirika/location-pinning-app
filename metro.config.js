@@ -1,4 +1,5 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+const { wrapWithReanimatedMetroConfig } = require('react-native-reanimated/metro-config');
 
 /**
  * Metro configuration
@@ -6,6 +7,8 @@ const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
  *
  * @type {import('metro-config').MetroConfig}
  */
-const config = {};
+const defaultConfig = getDefaultConfig(__dirname);
+const mergedConfig = mergeConfig(defaultConfig, {});
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+// in wrapping Metro configuration with Reanimated config, identifying misuses of the Reanimated API will be much easier than before
+module.exports = wrapWithReanimatedMetroConfig(mergedConfig);
