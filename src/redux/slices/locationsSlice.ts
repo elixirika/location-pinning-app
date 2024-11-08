@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { RootState } from '../store';
+import {GOOGLE_MAPS_API_KEY} from '@env'
 
 interface Location {
   id: string;
@@ -23,7 +24,7 @@ export const fetchAddress = createAsyncThunk(
   'locations/fetchAddress',
   async ({ latitude, longitude }: { latitude: number; longitude: number }) => {
     const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=GOOGLE_MAPS_API_KEY`
+      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${GOOGLE_MAPS_API_KEY}`
     );
     const data = await response.json();
     return {
