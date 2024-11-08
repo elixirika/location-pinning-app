@@ -62,11 +62,14 @@ const Overview: React.FC = () => {
   // Center map to the current location when the position updates
   useEffect(() => {
     if (position && mapRef.current) {
-      mapRef.current.animateToRegion({
-        ...position,
-        latitudeDelta: 0.005,
-        longitudeDelta: 0.005,
-      }, 1000);
+      mapRef.current.animateToRegion(
+        {
+          ...position,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        },
+        1000,
+      );
     }
   }, [position]);
 
@@ -97,6 +100,17 @@ const Overview: React.FC = () => {
           style={styles.map}
           initialRegion={getInitialRegion()}
           onPress={handleMapPress}>
+
+          {/* Display a marker at the current location */}
+          {position && (
+            <Marker
+              coordinate={position}
+              title="Current Location"
+              description="You are here"
+              pinColor="blue"
+            />
+          )}
+
           {/* Display a marker at the selected location */}
           {selectedLocation && (
             <Marker
