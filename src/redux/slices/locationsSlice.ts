@@ -7,6 +7,7 @@ interface Location {
   latitude: number;
   longitude: number;
   address?: string;
+  name?: string
 }
 
 interface LocationsState {
@@ -29,7 +30,7 @@ const initialState: LocationsState = {
 export const fetchAddress = createAsyncThunk(
   'locations/fetchAddress',
   async (
-    { latitude, longitude, isCurrentLocation = false }: { latitude: number; longitude: number; isCurrentLocation?: boolean },
+    { latitude, longitude, isCurrentLocation = false, name }: { latitude: number; longitude: number; isCurrentLocation?: boolean , name?: string},
     { rejectWithValue }
   ) => {
     try {
@@ -39,7 +40,7 @@ export const fetchAddress = createAsyncThunk(
       const data = await response.json();
       const address = data.results[0]?.formatted_address || 'Unknown location';
       
-      return { latitude, longitude, address, isCurrentLocation };
+      return { latitude, longitude, address, isCurrentLocation,name: name || 'unnamed' };
     } catch (error) {
       return rejectWithValue('Failed to fetch address');
     }
@@ -63,7 +64,7 @@ const locationsSlice = createSlice({
         state.status = 'loading';
       })
       .addCase(fetchAddress.fulfilled, (state, action) => {
-        const { latitude, longitude, address, isCurrentLocation } = action.payload;
+        const { latitude, longitude, address, isCurrentLocation, name } = action.payload;
 
         if (isCurrentLocation) {
           // Update the current location's address
@@ -76,7 +77,7 @@ const locationsSlice = createSlice({
           if (location) {
             location.address = address;
           } else {
-            state.locations.push({ id: `${latitude},${longitude}`, latitude, longitude, address });
+            state.locations.push({ id: `${latitude},${longitude}`, latitude, longitude, address , name});
           }
         }
 

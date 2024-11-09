@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Alert, StyleSheet, useColorScheme} from 'react-native';
 import {v4 as uuidv4} from 'uuid';
 import {Region} from 'react-native-maps';
@@ -16,7 +16,8 @@ import {Location} from '../../types/types';
 import {Colors} from '../../utils/colors';
 import {MapHandler} from './MapHandler';
 import BottomSheetComponent from './BottomSheetComponent';
-import { CurrentLocationButton } from './CurrentLocationButton';
+import {CurrentLocationButton} from './CurrentLocationButton';
+import LocationNameModal from './LocationNameModal';
 
 const Overview: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -29,27 +30,53 @@ const Overview: React.FC = () => {
 
   const {position, getCurrentPosition} = useGeolocation(dispatch);
 
-  const handleMapPress = async (e: any) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newLocationCoords, setNewLocationCoords] = useState<{
+    latitude: number;
+    longitude: number;
+  } | null>(null);
+
+  // Open modal and store coordinates on map press
+  const handleMapPress = (e: any) => {
     const {latitude, longitude} = e.nativeEvent.coordinate;
-    const resultAction = await dispatch(fetchAddress({latitude, longitude}));
-    if (fetchAddress.fulfilled.match(resultAction)) {
-      dispatch(
-        addLocation({
-          id: uuidv4(),
-          latitude,
-          longitude,
-          address: resultAction.payload.address,
-        }),
-      );
-    } else {
-      Alert.alert('Error', 'Could not fetch address');
-    }
+    setNewLocationCoords({latitude, longitude});
+    setModalVisible(true);
   };
 
-  const confirmDeleteLocation = (id: string) => {
+  const handleModalSubmit = async (locationName: string) => {
+    if (newLocationCoords) {
+      const {latitude, longitude} = newLocationCoords;
+      const resultAction = await dispatch(
+        fetchAddress({latitude, longitude, name: locationName}),
+      );
+
+      if (fetchAddress.fulfilled.match(resultAction)) {
+        dispatch(
+          addLocation({
+            id: uuidv4(),
+            latitude,
+            longitude,
+            address: resultAction.payload.address,
+            name: locationName,
+          }),
+        );
+      } else {
+        Alert.alert('Error', 'Could not fetch address');
+      }
+    }
+    setModalVisible(false);
+    setNewLocationCoords(null);
+  };
+
+  const handleModalCancel = () => {
+    setModalVisible(false);
+    setNewLocationCoords(null);
+  };
+
+  const confirmDeleteLocation = (id: string, name?: string) => {
     Alert.alert(
-      'Delete Location',
-      `Are you sure you want to delete this location?\n${id}`,
+      `Delete ${name}`,
+      `Are you sure you want to delete this location?`,
       [
         {text: 'Cancel', style: 'cancel'},
         {
@@ -68,33 +95,55 @@ const Overview: React.FC = () => {
     longitudeDelta: 0.005,
   });
 
-  return (
-      <GestureHandlerRootView style={{flex: 1}}>
-        <MapHandler
-          locations={locations}
-          position={position}
-          handleMapPress={handleMapPress}
-          confirmDeleteLocation={confirmDeleteLocation}
-          getInitialRegion={getInitialRegion}
-          address={currentLocation?.address}
-        />
-        <CurrentLocationButton
-          address={currentLocation?.address}
-          getCurrentPosition={getCurrentPosition}
-          currentColors={currentColors}
-        />
+  // Filter locations to show only unique addresses
+  const uniqueLocations = locations.filter(
+    (location, index, self) =>
+      index === self.findIndex(loc => loc.address === location.address),
+  );
+  const filteredLocations = uniqueLocations.filter(
+    location =>
+      !(
+        position &&
+        location.latitude === position.latitude &&
+        location.longitude === position.longitude
+      ),
+  );
 
-        <BottomSheetComponent
-          currentAddress={currentLocation?.address ?? null}
-          backgroundStyle={{backgroundColor: currentColors.background}}
-          textStyle={{color: currentColors.text}}
-          locations={locations}
-        />
-      </GestureHandlerRootView>
+  return (
+    <GestureHandlerRootView style={{flex: 1}}>
+      <MapHandler
+        locations={filteredLocations}
+        position={position}
+        handleMapPress={handleMapPress}
+        confirmDeleteLocation={confirmDeleteLocation}
+        getInitialRegion={getInitialRegion}
+        address={currentLocation?.address}
+        handlePinLongPress={confirmDeleteLocation}
+      />
+      <CurrentLocationButton
+        address={currentLocation?.address}
+        getCurrentPosition={getCurrentPosition}
+        currentColors={currentColors}
+      />
+      <BottomSheetComponent
+        currentAddress={currentLocation?.address ?? null}
+        backgroundStyle={{backgroundColor: currentColors.background}}
+        textStyle={{color: currentColors.text}}
+        locations={filteredLocations}
+      />
+      <LocationNameModal
+        visible={modalVisible}
+        onSubmit={handleModalSubmit}
+        onCancel={handleModalCancel}
+        backgroundColor={currentColors.background}
+        textColor={currentColors.text}
+      />
+    </GestureHandlerRootView>
   );
 };
 
 export default Overview;
+
 const styles = StyleSheet.create({
   bottomSheetContent: {
     padding: 20,

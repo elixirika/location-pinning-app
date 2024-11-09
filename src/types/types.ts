@@ -7,6 +7,7 @@ export interface Coordinates {
 }
 
 export interface Location {
+  name?: string;
   id: string;
   latitude: number;
   longitude: number;
@@ -26,7 +27,8 @@ export interface MapHandlerProps {
   locations: Location[];
   position: Coordinates | null;
   handleMapPress: (e: any) => void;
-  confirmDeleteLocation: (id: string) => void;
+  handlePinLongPress?: (e: any) => void;
+  confirmDeleteLocation: (id: string, name?: string) => void;
   getInitialRegion: () => Region;
   address?: string | null | undefined;
 }

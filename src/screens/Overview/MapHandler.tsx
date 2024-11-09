@@ -9,25 +9,14 @@ export const MapHandler: React.FC<MapHandlerProps> = ({
   locations,
   position,
   handleMapPress,
+  handlePinLongPress,
   confirmDeleteLocation,
   getInitialRegion,
   address,
 }) => {
   const mapRef = useRef<MapView | null>(null);
 
-  // Filter locations to show only unique addresses
-  const uniqueLocations = locations.filter(
-    (location, index, self) =>
-      index === self.findIndex(loc => loc.address === location.address),
-  );
-  const filteredLocations = uniqueLocations.filter(
-    location =>
-      !(
-        position &&
-        location.latitude === position.latitude &&
-        location.longitude === position.longitude
-      ),
-  );
+ 
 
   useEffect(() => {
     if (position && mapRef.current) {
@@ -47,7 +36,10 @@ export const MapHandler: React.FC<MapHandlerProps> = ({
       ref={mapRef}
       style={styles.map}
       region={getInitialRegion()}
-      onPress={handleMapPress}>
+      onPress={handleMapPress}
+      onLongPress={handlePinLongPress}
+      showsCompass={false}
+      >
       {position && (
         <Marker
           coordinate={position}
@@ -63,16 +55,16 @@ export const MapHandler: React.FC<MapHandlerProps> = ({
         </Marker>
       )}
 
-      {filteredLocations.map(location => (
+      {locations.map(location => (
         <Marker
           key={location.id}
           coordinate={{
             latitude: location.latitude,
             longitude: location.longitude,
           }}
-          title="Saved Location"
+          title={`Saved Location: ${location?.name}`}
           description={location.address || 'Fetching address...'}
-          onPress={() => confirmDeleteLocation(location.id)}
+          onPress={() => confirmDeleteLocation(location.id, location.name)}
           pinColor={Colors.active}
         />
       ))}

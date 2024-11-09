@@ -28,8 +28,8 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   const renderItem = useCallback(
     ({item}: {item: Location}) => (
       <Card customStyle={backgroundStyle}>
-        <Text style={styles.locationName}>{item.address}</Text>
-        <Text style={styles.coords}>{item.id}</Text>
+        <Text style={styles.locationName}>{item.name}</Text>
+        <Text style={styles.coords}>{item.address}</Text>
       </Card>
     ),
     [],

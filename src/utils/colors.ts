@@ -10,6 +10,7 @@ export const Colors = {
     active: '#50ad56',
     inactive: '#a9a9a9',
     darkDefault: '#000',
-    lightDefault: '#fff'
+    lightDefault: '#fff',
+    danger: '#b50e24',
   };
   
