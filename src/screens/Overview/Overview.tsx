@@ -3,7 +3,6 @@ import {Alert, StyleSheet, useColorScheme} from 'react-native';
 import {v4 as uuidv4} from 'uuid';
 import {Region} from 'react-native-maps';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-import ThemedScreen from '../../components/ThemedScreen';
 import {useAppDispatch, useAppSelector} from '../../hooks/hooks';
 import {useGeolocation} from '../../hooks/useGeolocation';
 import {
@@ -15,9 +14,9 @@ import {
 } from '../../redux/slices/locationsSlice';
 import {Location} from '../../types/types';
 import {Colors} from '../../utils/colors';
-import {AddressDisplay} from './AdressDisplay';
 import {MapHandler} from './MapHandler';
 import BottomSheetComponent from './BottomSheetComponent';
+import { CurrentLocationButton } from './CurrentLocationButton';
 
 const Overview: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -70,7 +69,6 @@ const Overview: React.FC = () => {
   });
 
   return (
-    <ThemedScreen>
       <GestureHandlerRootView style={{flex: 1}}>
         <MapHandler
           locations={locations}
@@ -80,7 +78,7 @@ const Overview: React.FC = () => {
           getInitialRegion={getInitialRegion}
           address={currentLocation?.address}
         />
-        <AddressDisplay
+        <CurrentLocationButton
           address={currentLocation?.address}
           getCurrentPosition={getCurrentPosition}
           currentColors={currentColors}
@@ -88,9 +86,11 @@ const Overview: React.FC = () => {
 
         <BottomSheetComponent
           currentAddress={currentLocation?.address ?? null}
+          backgroundStyle={{backgroundColor: currentColors.background}}
+          textStyle={{color: currentColors.text}}
+          locations={locations}
         />
       </GestureHandlerRootView>
-    </ThemedScreen>
   );
 };
 
