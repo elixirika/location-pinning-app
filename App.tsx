@@ -1,9 +1,10 @@
+import 'react-native-get-random-values';
 import React from 'react';
 import { View, Text } from 'react-native';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { enableFreeze } from 'react-native-screens';
-import Overview from './src/screens/Overview';
+import Overview from './src/screens/Overview/Overview';
 import store, {  persistor } from './src/redux/store';
 
 enableFreeze(true);

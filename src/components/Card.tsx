@@ -1,7 +1,11 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ViewStyle} from 'react-native';
 import {Colors} from '../utils/colors';
-import {CardProps} from '../types/types';
+
+interface CardProps {
+  children: React.ReactNode;
+  customStyle?: ViewStyle;
+}
 
 const Card: React.FC<CardProps> = ({children, customStyle}) => {
   return (
