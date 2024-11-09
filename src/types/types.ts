@@ -1,4 +1,4 @@
-import {ViewStyle} from 'react-native';
+import {TextStyle, ViewStyle} from 'react-native';
 import {Region} from 'react-native-maps';
 
 export interface Coordinates {
@@ -30,5 +30,14 @@ export interface MapHandlerProps {
   handlePinLongPress?: (e: any) => void;
   confirmDeleteLocation: (id: string, name?: string) => void;
   getInitialRegion: () => Region;
-  address?: string | null | undefined;
+  address: string | null | undefined;
+}
+
+export interface BottomSheetProps {
+  currentAddress: string | null | undefined;
+  style?: ViewStyle;
+  backgroundStyle?: ViewStyle;
+  textStyle?: TextStyle;
+  locations: Location[];
+  currentLocation: Coordinates | null;
 }

@@ -1,20 +1,13 @@
-import React, {useCallback, useRef} from 'react';
-import {StyleSheet, Text, TextStyle, View, ViewStyle} from 'react-native';
+import React, {useCallback, useMemo, useRef} from 'react';
+import {StyleSheet, Text, View} from 'react-native';
 import BottomSheet, {
   BottomSheetView,
   BottomSheetFlatList,
 } from '@gorhom/bottom-sheet';
-import {Colors} from '../../utils/colors';
-import {Location} from '../../types/types';
 import Card from '../../components/Card';
-
-interface BottomSheetProps {
-  currentAddress: string | null;
-  style?: ViewStyle;
-  backgroundStyle?: ViewStyle;
-  textStyle?: TextStyle;
-  locations: Location[];
-}
+import {calculateDistancesFromPosition} from '../../utils/helpers';
+import {Colors} from '../../utils/colors';
+import {BottomSheetProps, Location} from '../../types/types';
 
 const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   currentAddress,
@@ -22,17 +15,35 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   backgroundStyle,
   textStyle,
   locations,
+  currentLocation,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // Only calculate distances if currentLocation exists
+  const distances = useMemo(
+    () => calculateDistancesFromPosition(currentLocation, locations),
+    [currentLocation, locations],
+  );
+
+  const renderDistance = (itemId: string) => {
+    if (!currentLocation)
+      return <Text style={styles.coords}>Calculating distance...</Text>;
+    return (
+      <Text style={styles.coords}>
+        ~{distances[itemId]?.toFixed(2)} km away 
+      </Text>
+    );
+  };
 
   const renderItem = useCallback(
     ({item}: {item: Location}) => (
       <Card customStyle={backgroundStyle}>
         <Text style={styles.locationName}>{item.name}</Text>
         <Text style={styles.coords}>{item.address}</Text>
+        {renderDistance(item.id)}
       </Card>
     ),
-    [],
+    [distances, backgroundStyle, currentLocation],
   );
 
   return (
@@ -51,15 +62,15 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
         </Text>
       </BottomSheetView>
       <BottomSheetFlatList
-      style={{marginVertical: 15}}
+        style={{marginVertical: 15}}
         data={locations}
         keyExtractor={i => i.id}
         renderItem={renderItem}
         ListEmptyComponent={
-          <View  style={{marginBottom: 10}}>
-          <Text style={[styles.text, textStyle]}>
-            Add a location by tapping on the map
-          </Text>
+          <View style={{marginBottom: 10}}>
+            <Text style={[styles.text, textStyle]}>
+              Add a location by tapping on the map
+            </Text>
           </View>
         }
         nestedScrollEnabled
@@ -88,12 +99,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     alignSelf: 'center',
     color: Colors.active,
-  },
-  itemContainer: {
-    padding: 6,
-    margin: 6,
-    backgroundColor: '#eee',
-    borderRadius: 5,
   },
   locationName: {
     fontSize: 16,

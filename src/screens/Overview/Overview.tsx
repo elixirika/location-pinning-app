@@ -130,6 +130,7 @@ const Overview: React.FC = () => {
         backgroundStyle={{backgroundColor: currentColors.background}}
         textStyle={{color: currentColors.text}}
         locations={filteredLocations}
+        currentLocation={position}
       />
       <LocationNameModal
         visible={modalVisible}
