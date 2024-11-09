@@ -18,13 +18,17 @@ const Card: React.FC<CardProps> = ({children, customStyle}) => {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 8,
-    shadowColor: Colors.darkDefault,
-    shadowOffset: {width: 0, height: 2},
+    shadowColor: Colors.active,
     shadowOpacity: 0.1,
     shadowRadius: 6,
+    shadowOffset: {width: 0, height: 2},
     elevation: 4,
     flex: 1,
     margin: 5,
+    padding: 10,
+    borderColor: Colors.active,
+    borderWidth: 0.2,
+    marginHorizontal: 15,
   },
   cardContent: {
     padding: 16,

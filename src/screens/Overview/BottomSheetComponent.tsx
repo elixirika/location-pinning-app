@@ -1,23 +1,69 @@
-import React, {useRef} from 'react';
-import {StyleSheet, Text} from 'react-native';
-import BottomSheet, {BottomSheetView} from '@gorhom/bottom-sheet';
+import React, {useCallback, useRef} from 'react';
+import {StyleSheet, Text, TextStyle, View, ViewStyle} from 'react-native';
+import BottomSheet, {
+  BottomSheetView,
+  BottomSheetFlatList,
+} from '@gorhom/bottom-sheet';
 import {Colors} from '../../utils/colors';
+import {Location} from '../../types/types';
+import Card from '../../components/Card';
 
-const BottomSheetComponent: React.FC<{currentAddress: string | null}> = ({
+interface BottomSheetProps {
+  currentAddress: string | null;
+  style?: ViewStyle;
+  backgroundStyle?: ViewStyle;
+  textStyle?: TextStyle;
+  locations: Location[];
+}
+
+const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   currentAddress,
+  style,
+  backgroundStyle,
+  textStyle,
+  locations,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
+
+  const renderItem = useCallback(
+    ({item}: {item: Location}) => (
+      <Card customStyle={backgroundStyle}>
+        <Text style={styles.locationName}>{item.address}</Text>
+        <Text style={styles.coords}>{item.id}</Text>
+      </Card>
+    ),
+    [],
+  );
 
   return (
     <BottomSheet
       ref={bottomSheetRef}
       index={0}
-      snapPoints={['5%']} // Included bottom snap point only ince enableDynamicSizing is true
-      handleIndicatorStyle={styles.handleIndicator}>
-      <BottomSheetView style={styles.bottomSheetContent}>
-        <Text style={styles.sheetTitle}>Location Details</Text>
-        <Text>Current Address: {currentAddress || 'Fetching address...'}</Text>
+      snapPoints={['20%', '80%']}
+      maxDynamicContentSize={100}
+      handleIndicatorStyle={styles.handleIndicator}
+      backgroundStyle={backgroundStyle}
+      bottomInset={0}>
+      <BottomSheetView style={[styles.bottomSheetContent, style]}>
+        <Text style={[styles.sheetTitle, textStyle]}>Location Details</Text>
+        <Text style={[textStyle]}>
+          Current Location: {currentAddress || 'Fetching current location...'}
+        </Text>
       </BottomSheetView>
+      <BottomSheetFlatList
+      style={{marginVertical: 15}}
+        data={locations}
+        keyExtractor={i => i.id}
+        renderItem={renderItem}
+        ListEmptyComponent={
+          <View  style={{marginBottom: 10}}>
+          <Text style={[styles.text, textStyle]}>
+            Add a location by tapping on the map
+          </Text>
+          </View>
+        }
+        nestedScrollEnabled
+      />
     </BottomSheet>
   );
 };
@@ -25,15 +71,37 @@ const BottomSheetComponent: React.FC<{currentAddress: string | null}> = ({
 export default BottomSheetComponent;
 
 const styles = StyleSheet.create({
+  handleIndicator: {
+    backgroundColor: Colors.inactive,
+  },
   bottomSheetContent: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   sheetTitle: {
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 10,
   },
-  handleIndicator: {
-    backgroundColor: Colors.inactive,
+  text: {
+    fontSize: 20,
+    fontWeight: '600',
+    alignSelf: 'center',
+    color: Colors.active,
+  },
+  itemContainer: {
+    padding: 6,
+    margin: 6,
+    backgroundColor: '#eee',
+    borderRadius: 5,
+  },
+  locationName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.active,
+  },
+  coords: {
+    fontSize: 14,
+    color: Colors.inactive,
   },
 });
