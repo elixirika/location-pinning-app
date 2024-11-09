@@ -1,28 +1,38 @@
 import React from 'react';
-import { Alert, View, useColorScheme } from 'react-native';
-import { v4 as uuidv4 } from 'uuid';
-import { Region } from 'react-native-maps';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
+import {Alert, StyleSheet, useColorScheme} from 'react-native';
+import {v4 as uuidv4} from 'uuid';
+import {Region} from 'react-native-maps';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import ThemedScreen from '../../components/ThemedScreen';
-import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
-import { useGeolocation } from '../../hooks/useGeolocation';
-import { selectLocations, selectCurrentLocation, fetchAddress, addLocation, deleteLocation } from '../../redux/slices/locationsSlice';
-import { Location } from '../../types/types';
-import { AddressDisplay } from './AdressDisplay';
-import { MapHandler } from './MapHandler';
+import {useAppDispatch, useAppSelector} from '../../hooks/hooks';
+import {useGeolocation} from '../../hooks/useGeolocation';
+import {
+  selectLocations,
+  selectCurrentLocation,
+  fetchAddress,
+  addLocation,
+  deleteLocation,
+} from '../../redux/slices/locationsSlice';
+import {Location} from '../../types/types';
+import {Colors} from '../../utils/colors';
+import {AddressDisplay} from './AdressDisplay';
+import {MapHandler} from './MapHandler';
+import BottomSheetComponent from './BottomSheetComponent';
 
 const Overview: React.FC = () => {
   const dispatch = useAppDispatch();
   const locations = useAppSelector(selectLocations) as Location[];
-  const currentLocation = useAppSelector(selectCurrentLocation) as Location | null;
+  const currentLocation = useAppSelector(
+    selectCurrentLocation,
+  ) as Location | null;
   const isDarkMode = useColorScheme() === 'dark';
   const currentColors = isDarkMode ? Colors.dark : Colors.light;
 
-  const { position, getCurrentPosition } = useGeolocation(dispatch);
+  const {position, getCurrentPosition} = useGeolocation(dispatch);
 
-  const handleMapPress = async (e:any) => {
-    const { latitude, longitude } = e.nativeEvent.coordinate;
-    const resultAction = await dispatch(fetchAddress({ latitude, longitude }));
+  const handleMapPress = async (e: any) => {
+    const {latitude, longitude} = e.nativeEvent.coordinate;
+    const resultAction = await dispatch(fetchAddress({latitude, longitude}));
     if (fetchAddress.fulfilled.match(resultAction)) {
       dispatch(
         addLocation({
@@ -42,8 +52,12 @@ const Overview: React.FC = () => {
       'Delete Location',
       `Are you sure you want to delete this location?\n${id}`,
       [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Delete', style: 'destructive', onPress: () => dispatch(deleteLocation(id)) },
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => dispatch(deleteLocation(id)),
+        },
       ],
     );
   };
@@ -57,7 +71,7 @@ const Overview: React.FC = () => {
 
   return (
     <ThemedScreen>
-      <View style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{flex: 1}}>
         <MapHandler
           locations={locations}
           position={position}
@@ -71,9 +85,27 @@ const Overview: React.FC = () => {
           getCurrentPosition={getCurrentPosition}
           currentColors={currentColors}
         />
-      </View>
+
+        <BottomSheetComponent
+          currentAddress={currentLocation?.address ?? null}
+        />
+      </GestureHandlerRootView>
     </ThemedScreen>
   );
 };
 
 export default Overview;
+const styles = StyleSheet.create({
+  bottomSheetContent: {
+    padding: 20,
+    minHeight: 20,
+  },
+  sheetTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+  },
+  handleIndicator: {
+    backgroundColor: Colors.inactive,
+  },
+});
