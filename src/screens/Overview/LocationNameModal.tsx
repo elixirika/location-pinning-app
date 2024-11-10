@@ -9,14 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {Colors} from '../../utils/colors';
-
-interface LocationNameModalProps {
-  visible: boolean;
-  onSubmit: (name: string) => void;
-  onCancel: () => void;
-  backgroundColor: string;
-  textColor: string;
-}
+import { LocationNameModalProps } from '../../types/types';
 
 const LocationNameModal: React.FC<LocationNameModalProps> = ({
   visible,
@@ -24,8 +17,10 @@ const LocationNameModal: React.FC<LocationNameModalProps> = ({
   onCancel,
   backgroundColor,
   textColor,
+  isEdit,
+  locationName = '' 
 }) => {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(locationName); 
 
   const handleNameChange = (text: string) => setName(text);
 
@@ -43,32 +38,30 @@ const LocationNameModal: React.FC<LocationNameModalProps> = ({
     <Modal visible={visible} transparent={true} animationType="none">
       <TouchableWithoutFeedback onPress={handleCancel}>
         <View style={styles.modalContainer}>
-          <TouchableWithoutFeedback onPress={() => {}}>
-            <View
-              style={[styles.modalContent, {backgroundColor: backgroundColor}]}>
-              <Text style={[styles.modalTitle, {color: textColor}]}>
-                Add Location Name
-              </Text>
-              <TextInput
-                style={[styles.input]}
-                placeholder="Location Name"
-                value={name}
-                onChangeText={handleNameChange}
+          <View
+            style={[styles.modalContent, {backgroundColor: backgroundColor}]}>
+            <Text style={[styles.modalTitle, {color: textColor}]}>
+              {isEdit ? 'Edit location Name' : 'Add Location Name'}
+            </Text>
+            <TextInput
+              style={[styles.input]}
+              placeholder="Location Name"
+              value={name}
+              onChangeText={handleNameChange}
+            />
+            <View style={styles.buttonContainer}>
+              <Button
+                title="Cancel"
+                onPress={handleCancel}
+                color={Colors.danger}
               />
-              <View style={styles.buttonContainer}>
-                <Button
-                  title="Cancel"
-                  onPress={handleCancel}
-                  color={Colors.danger}
-                />
-                <Button
-                  title="Save"
-                  onPress={handleSubmit}
-                  color={Colors.active}
-                />
-              </View>
+              <Button
+                title="Save"
+                onPress={handleSubmit}
+                color={Colors.active}
+              />
             </View>
-          </TouchableWithoutFeedback>
+          </View>
         </View>
       </TouchableWithoutFeedback>
     </Modal>

@@ -40,4 +40,18 @@ export interface BottomSheetProps {
   textStyle?: TextStyle;
   locations: Location[];
   currentLocation: Coordinates | null;
+  confirmDeleteLocation: (id: string, name?: string) => void;
+  clearAllLocations: () => void;
+  isSheetExpanded: boolean;
+  setIsSheetExpanded: (value: boolean) => void;
+}
+
+export interface LocationNameModalProps {
+  visible: boolean;
+  onSubmit: (name: string) => void;
+  onCancel: () => void;
+  backgroundColor: string;
+  textColor: string;
+  isEdit?: boolean;
+  locationName?: string;
 }

@@ -1,3 +1,4 @@
+import './reanimatedConfig';
 import 'react-native-get-random-values';
 import React from 'react';
 import { View, Text } from 'react-native';
