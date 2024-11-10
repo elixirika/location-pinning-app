@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {Alert, StyleSheet, useColorScheme} from 'react-native';
 import {Region} from 'react-native-maps';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
@@ -9,7 +9,9 @@ import {
   selectLocations,
   selectCurrentLocation,
   deleteLocation,
+  updateLocation,
 } from '../../redux/slices/locationsSlice';
+import {calculateDistancesFromPosition} from '../../utils/helpers';
 import {Location} from '../../types/types';
 import {Colors} from '../../utils/colors';
 import {MapHandler} from './MapHandler';
@@ -39,8 +41,14 @@ const Overview: React.FC = () => {
   } = useLocationModal(locations, currentLocation);
 
   const handleMapPress = (e: any) => {
-    const {latitude, longitude} = e.nativeEvent.coordinate;
-    openModal({latitude, longitude});
+    const {coordinate} = e.nativeEvent;
+
+    if (coordinate) {
+      const {latitude, longitude} = coordinate;
+      openModal({latitude, longitude});
+    } else {
+      console.warn('No coordinates found in the event.');
+    }
   };
 
   const confirmDeleteLocation = (id: string, name?: string) => {
@@ -58,6 +66,31 @@ const Overview: React.FC = () => {
     );
   };
 
+  const confirmDeleteAll = () => {
+    Alert.alert(
+      `Delete All`,
+      `Are you sure you want to delete all saved locations?`,
+      [
+        {text: 'Cancel', style: 'cancel'},
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: clearAllLocations,
+        },
+      ],
+    );
+  };
+
+  const handleMarkerDragEnd = (locationId: string, e: any) => {
+    const {latitude, longitude} = e.nativeEvent.coordinate;
+    dispatch(updateLocation({id: locationId, latitude, longitude}));
+  };
+
+  const distances: Record<string, number> = useMemo(
+    () => calculateDistancesFromPosition(currentLocation, locations),
+    [currentLocation, locations],
+  );
+
   const getInitialRegion = (): Region => ({
     latitude: currentLocation?.latitude || 37.78825,
     longitude: currentLocation?.longitude || -122.4324,
@@ -68,12 +101,14 @@ const Overview: React.FC = () => {
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <MapHandler
-        locations={locations}
+        locations={uniqueLocations}
         position={currentLocation}
         handleMapPress={handleMapPress}
         confirmDeleteLocation={confirmDeleteLocation}
         getInitialRegion={getInitialRegion}
         address={currentLocation?.address}
+        handleMarkerDragEnd={handleMarkerDragEnd}
+        distances={distances}
       />
       <CurrentLocationButton
         address={currentLocation?.address}
@@ -84,12 +119,13 @@ const Overview: React.FC = () => {
         currentAddress={currentLocation?.address ?? null}
         backgroundStyle={{backgroundColor: currentColors.background}}
         textStyle={{color: currentColors.text}}
-        locations={locations}
+        locations={uniqueLocations}
         currentLocation={currentLocation}
         confirmDeleteLocation={confirmDeleteLocation}
-        clearAllLocations={clearAllLocations}
+        clearAllLocations={confirmDeleteAll}
         isSheetExpanded={isSheetExpanded}
         setIsSheetExpanded={setIsSheetExpanded}
+        distances={distances}
       />
       <LocationNameModal
         visible={modalVisible}

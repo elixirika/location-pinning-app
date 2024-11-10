@@ -1,11 +1,5 @@
 import React, {useCallback, useMemo, useRef} from 'react';
-import {
-  Button,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-} from 'react-native';
+import {Button, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import BottomSheet, {
   BottomSheetView,
   BottomSheetFlatList,
@@ -29,7 +23,10 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   locations,
   currentLocation,
   confirmDeleteLocation,
-  clearAllLocations,isSheetExpanded, setIsSheetExpanded
+  clearAllLocations,
+  isSheetExpanded,
+  setIsSheetExpanded,
+  distances,
 }) => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const swipeableRefs = useRef(new Map()).current;
@@ -43,11 +40,6 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
       bottomSheetRef.current.snapToIndex(0);
     }
   };
-  // Only calculate distances if currentLocation exists
-  const distances = useMemo(
-    () => calculateDistancesFromPosition(currentLocation, locations),
-    [currentLocation, locations],
-  );
 
   const renderDistance = (itemId: string) => {
     if (!currentLocation)
@@ -148,8 +140,15 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
             Current Location: {currentAddress || 'Fetching current location...'}
           </Text>
         </BottomSheetView>
-        <Button title="Delete All Locations" onPress={clearAllLocations} />
 
+        <View style={styles.listTitleView}>
+          <Text style={[styles.listTitle, textStyle]}>Saved Locations</Text>
+          <Button
+            title="Delete All"
+            onPress={clearAllLocations}
+            color={Colors.danger}
+          />
+        </View>
         <BottomSheetFlatList
           style={{marginVertical: 15}}
           data={locations}
@@ -183,6 +182,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 10,
+  },
+  listTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  listTitleView: {
+    paddingHorizontal: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   text: {
     fontSize: 20,

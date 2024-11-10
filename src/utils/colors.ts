@@ -7,10 +7,12 @@ export const Colors = {
       background: '#333333', // Background color for dark mode
       text: '#ffffff', // Text color for dark mode
     },
-    active: '#50ad56',
+    active: '#16a34a',
     inactive: '#a9a9a9',
     darkDefault: '#000',
     lightDefault: '#fff',
-    danger: '#b50e24',
+    danger: '#dc2626',
+    cyan: '#06b6d4',
+    lime: '#84cc16'
   };
   

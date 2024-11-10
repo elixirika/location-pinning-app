@@ -31,6 +31,8 @@ export interface MapHandlerProps {
   confirmDeleteLocation: (id: string, name?: string) => void;
   getInitialRegion: () => Region;
   address: string | null | undefined;
+  handleMarkerDragEnd: (locationId: string, e: any) => void;
+  distances: {[id: string]: number};
 }
 
 export interface BottomSheetProps {
@@ -44,6 +46,7 @@ export interface BottomSheetProps {
   clearAllLocations: () => void;
   isSheetExpanded: boolean;
   setIsSheetExpanded: (value: boolean) => void;
+  distances: {[id: string]: number};
 }
 
 export interface LocationNameModalProps {

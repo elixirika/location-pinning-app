@@ -2,7 +2,6 @@ import { configureStore } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import locationsReducer from './slices/locationsSlice';
-import uiReducer from './slices/uiSlice';
 
 const persistConfig = {
   key: 'root',
@@ -12,7 +11,6 @@ const persistConfig = {
 
 const rootReducer = {
   locations: persistReducer(persistConfig, locationsReducer),
-  ui: uiReducer,
 };
 
 const store = configureStore({
