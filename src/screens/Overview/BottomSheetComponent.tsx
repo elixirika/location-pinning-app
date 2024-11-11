@@ -1,4 +1,4 @@
-import React, {useCallback, useMemo, useRef} from 'react';
+import React, {useCallback, useRef} from 'react';
 import {Button, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
 import BottomSheet, {
   BottomSheetView,
@@ -9,9 +9,9 @@ import Reanimated, {
   SharedValue,
   useAnimatedStyle,
 } from 'react-native-reanimated';
+import _ from 'lodash';
 import Card from '../../components/Card';
 import CustomSvg from '../../components/CustomSvg';
-import {calculateDistancesFromPosition} from '../../utils/helpers';
 import {Colors} from '../../utils/colors';
 import {BottomSheetProps, Location} from '../../types/types';
 
@@ -27,18 +27,16 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
   isSheetExpanded,
   setIsSheetExpanded,
   distances,
+  bottomSheetRef,
+  minimizeSheet,
 }) => {
-  const bottomSheetRef = useRef<BottomSheet>(null);
   const swipeableRefs = useRef(new Map()).current;
 
-  const handleSheetChange = (index: number) => {
+  const handleSheetChange = (index: number, position:any) => {
+    console.log('index',index)
+    console.log('position',position)
+    // console.log( 'bottomSheetRef.current',bottomSheetRef.current)
     setIsSheetExpanded(index > 0);
-  };
-
-  const handleOutsidePress = () => {
-    if (bottomSheetRef.current) {
-      bottomSheetRef.current.snapToIndex(0);
-    }
   };
 
   const renderDistance = (itemId: string) => {
@@ -122,7 +120,7 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
         <TouchableOpacity
           style={styles.overlay}
           activeOpacity={1}
-          onPress={handleOutsidePress}
+          onPress={minimizeSheet}
         />
       )}
       <BottomSheet
@@ -141,26 +139,27 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
           </Text>
         </BottomSheetView>
 
-        <View style={styles.listTitleView}>
-          <Text style={[styles.listTitle, textStyle]}>Saved Locations</Text>
-          <Button
-            title="Delete All"
-            onPress={clearAllLocations}
-            color={Colors.danger}
-          />
-        </View>
+        {_.isEmpty(locations) ? (
+          <View style={{marginBottom: 10}}>
+            <Text style={[styles.text, textStyle]}>
+              Add a location by tapping on the map
+            </Text>
+          </View>
+        ) : (
+          <View style={styles.listTitleView}>
+            <Text style={[styles.listTitle, textStyle]}>Saved Locations</Text>
+            <Button
+              title="Delete All"
+              onPress={clearAllLocations}
+              color={Colors.danger}
+            />
+          </View>
+        )}
         <BottomSheetFlatList
           style={{marginVertical: 15}}
           data={locations}
           keyExtractor={item => item.id}
           renderItem={renderItem}
-          ListEmptyComponent={
-            <View style={{marginBottom: 10}}>
-              <Text style={[styles.text, textStyle]}>
-                Add a location by tapping on the map
-              </Text>
-            </View>
-          }
           nestedScrollEnabled
         />
       </BottomSheet>

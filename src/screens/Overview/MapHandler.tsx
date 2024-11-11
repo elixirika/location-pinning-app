@@ -1,10 +1,9 @@
-import React, {useRef, useEffect, useMemo} from 'react';
-import MapView, {Callout, Marker} from 'react-native-maps';
+import React, {useRef, useEffect} from 'react';
+import MapView, {Marker} from 'react-native-maps';
 import {StyleSheet} from 'react-native';
 import CustomSvg from '../../components/CustomSvg';
 import {MapHandlerProps} from '../../types/types';
 import {Colors} from '../../utils/colors';
-import {calculateDistancesFromPosition} from '../../utils/helpers';
 
 export const MapHandler: React.FC<MapHandlerProps> = ({
   locations,
@@ -16,9 +15,11 @@ export const MapHandler: React.FC<MapHandlerProps> = ({
   address,
   handleMarkerDragEnd,
   distances,
+  selectedCoordinates,
 }) => {
   const mapRef = useRef<MapView | null>(null);
 
+  // Update region when current position changes
   useEffect(() => {
     if (position && mapRef.current) {
       mapRef.current.animateToRegion(
@@ -31,6 +32,22 @@ export const MapHandler: React.FC<MapHandlerProps> = ({
       );
     }
   }, [position]);
+
+  // uppdate region when selectedCoordinates change (for zooming)
+  useEffect(() => {
+    if (selectedCoordinates && mapRef.current) {
+      const {latitude, longitude} = selectedCoordinates;
+      mapRef.current.animateToRegion(
+        {
+          latitude,
+          longitude,
+          latitudeDelta: 0.005,
+          longitudeDelta: 0.005,
+        },
+        1000,
+      );
+    }
+  }, [selectedCoordinates]);
 
   return (
     <MapView

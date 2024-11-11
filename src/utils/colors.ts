@@ -1,11 +1,11 @@
 export const Colors = {
     light: {
-      background: '#ffffff', // Background color for light mode
-      text: '#333333', // Text color for light mode
+      backgroundColor: '#ffffff', // Background color for light mode
+      textColor: '#333333', // Text color for light mode
     },
     dark: {
-      background: '#333333', // Background color for dark mode
-      text: '#ffffff', // Text color for dark mode
+      backgroundColor: '#333333', // Background color for dark mode
+      textColor: '#ffffff', // Text color for dark mode
     },
     active: '#16a34a',
     inactive: '#a9a9a9',

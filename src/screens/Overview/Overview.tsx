@@ -1,7 +1,8 @@
-import React, {useMemo, useState} from 'react';
-import {Alert, StyleSheet, useColorScheme} from 'react-native';
+import React, {useState, useMemo, useRef} from 'react';
+import {Alert, useColorScheme} from 'react-native';
 import {Region} from 'react-native-maps';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import BottomSheet from '@gorhom/bottom-sheet';
 import {useAppDispatch, useAppSelector} from '../../hooks/hooks';
 import {useGeolocation} from '../../hooks/useGeolocation';
 import {useLocationModal} from '../../hooks/useLocationModal';
@@ -18,6 +19,7 @@ import {MapHandler} from './MapHandler';
 import BottomSheetComponent from './BottomSheetComponent';
 import {CurrentLocationButton} from './CurrentLocationButton';
 import LocationNameModal from './LocationNameModal';
+import SearchField from './SearchField';
 
 const Overview: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,6 +28,13 @@ const Overview: React.FC = () => {
     selectCurrentLocation,
   ) as Location | null;
   const [isSheetExpanded, setIsSheetExpanded] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [selectedCoordinates, setSelectedCoordinates] = useState<{
+    latitude: number;
+    longitude: number;
+    address: string;
+  } | null>(null);
+  const bottomSheetRef = useRef<BottomSheet>(null);
   const isDarkMode = useColorScheme() === 'dark';
   const currentColors = isDarkMode ? Colors.dark : Colors.light;
 
@@ -42,12 +51,23 @@ const Overview: React.FC = () => {
 
   const handleMapPress = (e: any) => {
     const {coordinate} = e.nativeEvent;
-
     if (coordinate) {
       const {latitude, longitude} = coordinate;
       openModal({latitude, longitude});
-    } else {
-      console.warn('No coordinates found in the event.');
+    }
+  };
+
+  const handlePlaceSelect = (
+    latitude: number,
+    longitude: number,
+    address: string,
+  ) => {
+    setSelectedCoordinates({latitude, longitude, address});
+  };
+
+  const minimizeSheet = () => {
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.snapToIndex(1);
     }
   };
 
@@ -75,7 +95,9 @@ const Overview: React.FC = () => {
         {
           text: 'Delete',
           style: 'destructive',
-          onPress: clearAllLocations,
+          onPress: () => {
+            clearAllLocations(), minimizeSheet();
+          },
         },
       ],
     );
@@ -109,16 +131,23 @@ const Overview: React.FC = () => {
         address={currentLocation?.address}
         handleMarkerDragEnd={handleMarkerDragEnd}
         distances={distances}
+        selectedCoordinates={selectedCoordinates}
+      />
+      <SearchField
+        currentColors={currentColors}
+        onPlaceSelect={handlePlaceSelect}
+        isSearching={isSearching}
+        setIsSearching={setIsSearching}
+        minimizeSheet={minimizeSheet}
       />
       <CurrentLocationButton
         address={currentLocation?.address}
         getCurrentPosition={getCurrentPosition}
-        currentColors={currentColors}
       />
       <BottomSheetComponent
         currentAddress={currentLocation?.address ?? null}
-        backgroundStyle={{backgroundColor: currentColors.background}}
-        textStyle={{color: currentColors.text}}
+        backgroundStyle={{backgroundColor: currentColors.backgroundColor}}
+        textStyle={{color: currentColors.textColor}}
         locations={uniqueLocations}
         currentLocation={currentLocation}
         confirmDeleteLocation={confirmDeleteLocation}
@@ -126,13 +155,15 @@ const Overview: React.FC = () => {
         isSheetExpanded={isSheetExpanded}
         setIsSheetExpanded={setIsSheetExpanded}
         distances={distances}
+        bottomSheetRef={bottomSheetRef}
+        minimizeSheet={minimizeSheet}
       />
       <LocationNameModal
         visible={modalVisible}
         onSubmit={handleModalSubmit}
         onCancel={closeModal}
-        backgroundColor={currentColors.background}
-        textColor={currentColors.text}
+        backgroundColor={currentColors.backgroundColor}
+        textColor={currentColors.textColor}
         isEdit={isEdit}
       />
     </GestureHandlerRootView>
@@ -140,18 +171,3 @@ const Overview: React.FC = () => {
 };
 
 export default Overview;
-
-const styles = StyleSheet.create({
-  bottomSheetContent: {
-    padding: 20,
-    minHeight: 20,
-  },
-  sheetTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 10,
-  },
-  handleIndicator: {
-    backgroundColor: Colors.inactive,
-  },
-});

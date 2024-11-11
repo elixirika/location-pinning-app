@@ -4,23 +4,34 @@ import {Region} from 'react-native-maps';
 export interface Coordinates {
   latitude: number;
   longitude: number;
+  address?: string | null | undefined;
 }
 
-export interface Location {
-  name?: string;
+export interface LocationBase {
   id: string;
   latitude: number;
   longitude: number;
   address: string | null;
 }
 
-export interface AddressDisplayProps {
-  address: string | null | undefined;
+export interface Location extends LocationBase {
+  name?: string;
+}
+
+export interface Styles {
+  backgroundStyle?: ViewStyle;
+  style?: ViewStyle;
+  textStyle?: TextStyle;
+}
+
+export interface ColorScheme {
+  backgroundColor?: string;
+  textColor?: string;
+}
+
+export interface CurrentLocationProps extends ColorScheme {
   getCurrentPosition: () => void;
-  currentColors: {
-    background: string;
-    text: string;
-  };
+  address: string | null | undefined;
 }
 
 export interface MapHandlerProps {
@@ -33,13 +44,11 @@ export interface MapHandlerProps {
   address: string | null | undefined;
   handleMarkerDragEnd: (locationId: string, e: any) => void;
   distances: {[id: string]: number};
+  selectedCoordinates: Coordinates | null;
 }
 
-export interface BottomSheetProps {
+export interface BottomSheetProps extends Styles {
   currentAddress: string | null | undefined;
-  style?: ViewStyle;
-  backgroundStyle?: ViewStyle;
-  textStyle?: TextStyle;
   locations: Location[];
   currentLocation: Coordinates | null;
   confirmDeleteLocation: (id: string, name?: string) => void;
@@ -47,14 +56,22 @@ export interface BottomSheetProps {
   isSheetExpanded: boolean;
   setIsSheetExpanded: (value: boolean) => void;
   distances: {[id: string]: number};
+  bottomSheetRef: any;
+  minimizeSheet: () => void;
 }
 
-export interface LocationNameModalProps {
+export interface LocationNameModalProps extends ColorScheme {
   visible: boolean;
   onSubmit: (name: string) => void;
   onCancel: () => void;
-  backgroundColor: string;
-  textColor: string;
   isEdit?: boolean;
   locationName?: string;
+}
+
+export interface SearchFieldProps {
+  onPlaceSelect: (latitude: number, longitude: number, address: string) => void;
+  isSearching: boolean;
+  setIsSearching: (value: boolean) => void;
+  currentColors: ColorScheme;
+  minimizeSheet: () => void;
 }
