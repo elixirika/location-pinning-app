@@ -9,7 +9,7 @@
     "start": "react-native start",
     "test": "jest",
     "clean": "react-native start --reset-cache",
-    "pod": "cd ios && rm -r Podfile.lock && pod install && cd .."
+    "pod": "cd ios && pod install && cd .."
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "^5.0.5",

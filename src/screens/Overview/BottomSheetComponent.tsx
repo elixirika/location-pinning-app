@@ -32,11 +32,8 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
 }) => {
   const swipeableRefs = useRef(new Map()).current;
 
-  const handleSheetChange = (index: number, position:any) => {
-    console.log('index',index)
-    console.log('position',position)
-    // console.log( 'bottomSheetRef.current',bottomSheetRef.current)
-    setIsSheetExpanded(index > 0);
+  const handleSheetChange = (index: number) => {
+    setIsSheetExpanded(index > 1);
   };
 
   const renderDistance = (itemId: string) => {
@@ -96,10 +93,7 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
           if (ref) swipeableRefs.set(item.id, ref);
           else swipeableRefs.delete(item.id);
         }}
-        friction={2}
-        enableTrackpadTwoFingerGesture
         rightThreshold={100}
-        // onSwipeableWillOpen={() => console.log('swipeable open')}
         onSwipeableWillOpen={() =>
           handleConfirmDelete(item.id, item.name, item.id)
         }
@@ -125,7 +119,7 @@ const BottomSheetComponent: React.FC<BottomSheetProps> = ({
       )}
       <BottomSheet
         ref={bottomSheetRef}
-        index={0}
+        index={1}
         onChange={handleSheetChange}
         snapPoints={['20%', '80%']}
         maxDynamicContentSize={100}

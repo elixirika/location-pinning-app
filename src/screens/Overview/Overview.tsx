@@ -57,18 +57,19 @@ const Overview: React.FC = () => {
     }
   };
 
+  const minimizeSheet = () => {
+    if (bottomSheetRef.current) {
+      bottomSheetRef.current.snapToIndex(1);
+    }
+  };
+
   const handlePlaceSelect = (
     latitude: number,
     longitude: number,
     address: string,
   ) => {
     setSelectedCoordinates({latitude, longitude, address});
-  };
-
-  const minimizeSheet = () => {
-    if (bottomSheetRef.current) {
-      bottomSheetRef.current.snapToIndex(1);
-    }
+    minimizeSheet();
   };
 
   const confirmDeleteLocation = (id: string, name?: string) => {

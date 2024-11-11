@@ -9,7 +9,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import {Colors} from '../../utils/colors';
-import { LocationNameModalProps } from '../../types/types';
+import {LocationNameModalProps} from '../../types/types';
 
 const LocationNameModal: React.FC<LocationNameModalProps> = ({
   visible,
@@ -18,9 +18,9 @@ const LocationNameModal: React.FC<LocationNameModalProps> = ({
   backgroundColor,
   textColor,
   isEdit,
-  locationName = '' 
+  locationName = '',
 }) => {
-  const [name, setName] = useState(locationName); 
+  const [name, setName] = useState(locationName);
 
   const handleNameChange = (text: string) => setName(text);
 
@@ -44,7 +44,7 @@ const LocationNameModal: React.FC<LocationNameModalProps> = ({
               {isEdit ? 'Edit location Name' : 'Add Location Name'}
             </Text>
             <TextInput
-              style={[styles.input]}
+              style={[styles.input, {color: textColor}]}
               placeholder="Location Name"
               value={name}
               onChangeText={handleNameChange}
